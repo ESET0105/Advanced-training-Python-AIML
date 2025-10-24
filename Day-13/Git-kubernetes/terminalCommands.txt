@@ -1,0 +1,305 @@
+PS D:\Github\Git-kubernetes\kubernetes-demo> mkdir pods
+
+
+    Directory: D:\Github\Git-kubernetes\kubernetes-demo
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----        23-10-2025     16:13                pods
+
+
+PS D:\Github\Git-kubernetes\kubernetes-demo> kubectl get pods
+No resources found in default namespace.
+PS D:\Github\Git-kubernetes\kubernetes-demo> kubectl apply -f nginx.yml
+error: the path "nginx.yml" does not exist
+PS D:\Github\Git-kubernetes\kubernetes-demo> cd pods
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f nginx.yml
+pod/nginx created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods
+NAME    READY   STATUS    RESTARTS   AGE
+nginx   1/1     Running   0          16s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+The Pod "pod-print" is invalid: spec.containers[0].name: Invalid value: "milan(print)-container": a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+pod/pod-print created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods
+NAME        READY   STATUS         RESTARTS   AGE
+nginx       1/1     Running        0          13m
+pod-print   0/1     ErrImagePull   0          9s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods
+NAME        READY   STATUS         RESTARTS   AGE
+nginx       1/1     Running        0          13m
+pod-print   0/1     ErrImagePull   0          17s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f nginx.yml       
+pod/nginx unchanged
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f nginx.yml
+The Pod "nginx" is invalid: spec: Forbidden: pod updates may not change fields other than `spec.containers[*].image`,`spec.initContainers[*].image`,`spec.activeDeadlineSeconds`,`spec.tolerations` (only additions to existing tolerations),`spec.terminationGracePeriodSeconds` (allow it to be set to 1 if it was previously negative)
+@@ -96,7 +96,15 @@
+    "Command": null,
+    "Args": null,
+    "WorkingDir": "",
+-   "Ports": null,
++   "Ports": [
++    {
++     "Name": "",
++     "HostPort": 0,
++     "ContainerPort": 80,
++     "Protocol": "TCP",
++     "HostIP": ""
++    }
++   ],
+    "EnvFrom": null,
+    "Env": null,
+    "Resources": {
+
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod nginx
+pod "nginx" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f nginx.yml
+pod/nginx created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods          
+NAME        READY   STATUS             RESTARTS   AGE
+nginx       1/1     Running            0          6s
+pod-print   0/1     ImagePullBackOff   0          14m
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl port-forward ngix 8080:80
+Error from server (NotFound): pods "ngix" not found
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl port-forward.ngix 8080:80 
+error: unknown command "port-forward.ngix" for "kubectl"
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl port-forward nginx 8080:80
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80
+Handling connection for 8080
+Handling connection for 8080
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml 
+pod/pod-print configured
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods                  
+NAME        READY   STATUS             RESTARTS   AGE
+nginx       1/1     Running            0          16m
+pod-print   0/1     ImagePullBackOff   0          31m
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+pod/pod-print configured
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods
+NAME        READY   STATUS         RESTARTS   AGE
+nginx       1/1     Running        0          18m
+pod-print   0/1     ErrImagePull   0          32m
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+The Pod "pod-print" is invalid: spec: Forbidden: pod updates may not change fields other than `spec.containers[*].image`,`spec.initContainers[*].image`,`spec.activeDeadlineSeconds`,`spec.tolerations` (only additions to existing tolerations),`spec.terminationGracePeriodSeconds` (allow it to be set to 1 if it was previously negative)
+@@ -91,7 +91,7 @@
+  "InitContainers": null,
+  "Containers": [
+   {
+-   "Name": "milan-container",
++   "Name": "milancontainer",
+    "Image": "milanroat/my-printimage:main",
+    "Command": null,
+    "Args": null,
+@@ -107,17 +107,7 @@
+    "ResizePolicy": null,
+    "RestartPolicy": null,
+    "RestartPolicyRules": null,
+-   "VolumeMounts": [
+-    {
+-     "Name": "kube-api-access-8b2z4",
+-     "ReadOnly": true,
+-     "RecursiveReadOnly": null,
+-     "MountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+-     "SubPath": "",
+-     "MountPropagation": null,
+-     "SubPathExpr": ""
+-    }
+-   ],
++   "VolumeMounts": null,
+    "VolumeDevices": null,
+    "LivenessProbe": null,
+    "ReadinessProbe": null,
+@@ -125,7 +115,7 @@
+    "Lifecycle": null,
+    "TerminationMessagePath": "/dev/termination-log",
+    "TerminationMessagePolicy": "File",
+-   "ImagePullPolicy": "Always",
++   "ImagePullPolicy": "IfNotPresent",
+    "SecurityContext": null,
+    "Stdin": false,
+    "StdinOnce": false,
+
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod coustom_pods.yml
+Error from server (NotFound): pods "coustom_pods.yml" not found
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod pod-print       
+pod "pod-print" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml  
+pod/pod-print created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods
+NAME        READY   STATUS             RESTARTS     AGE
+nginx       1/1     Running            0            22m
+pod-print   0/1     CrashLoopBackOff   1 (3s ago)   5s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod pod-print     
+pod "pod-print" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+pod/pod-print created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods                 
+NAME        READY   STATUS              RESTARTS   AGE
+nginx       1/1     Running             0          23m
+pod-print   0/1     ContainerCreating   0          6s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods
+NAME        READY   STATUS    RESTARTS   AGE
+nginx       1/1     Running   0          23m
+pod-print   1/1     Running   0          18s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod pod-print     
+pod "pod-print" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+pod/pod-print created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods                 
+NAME        READY   STATUS    RESTARTS   AGE
+nginx       1/1     Running   0          24m
+pod-print   1/1     Running   0          3s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod nginx         
+pod "nginx" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods        
+NAME        READY   STATUS    RESTARTS   AGE
+pod-print   1/1     Running   0          2m14s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl delete pod pod-print
+pod "pod-print" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl apply -f coustom_pods.yml
+pod/pod-print created
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl get pods                 
+NAME        READY   STATUS    RESTARTS   AGE
+pod-print   1/1     Running   0          5s
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl port-forward pod-print 8080:80
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80
+Handling connection for 8080
+Handling connection for 8080
+E1023 17:15:27.949162   22688 portforward.go:424] "Unhandled Error" err=<
+        an error occurred forwarding 8080 -> 80: error forwarding port 80 to pod 016336983f0cd990346db6a0ae42d99052d6bba471a919223116481ea7b44c55, uid : exit status 1: 2025/10/23 11:45:27 socat[39667] E connect(6, AF=2 127.0.0.1:80, 16): Connection refused
+ >
+E1023 17:15:27.949162   22688 portforward.go:424] "Unhandled Error" err=<
+        an error occurred forwarding 8080 -> 80: error forwarding port 80 to pod 016336983f0cd990346db6a0ae42d99052d6bba471a919223116481ea7b44c55, uid : exit status 1: 2025/10/23 11:45:27 socat[39666] E connect(6, AF=2 127.0.0.1:80, 16): Connection refused
+ >
+error: lost connection to pod
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl log print-pod
+error: unknown command "log" for "kubectl"
+
+Did you mean this?
+        top
+        logs
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl logs pod-print
+Listening on 0.0.0.0:3000
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl port-forward pod-print 3000:8080
+Forwarding from 127.0.0.1:3000 -> 8080
+Forwarding from [::1]:3000 -> 8080
+Handling connection for 3000
+Handling connection for 3000
+E1023 17:19:30.492779   24864 portforward.go:424] "Unhandled Error" err=<
+        an error occurred forwarding 3000 -> 8080: error forwarding port 8080 to pod 016336983f0cd990346db6a0ae42d99052d6bba471a919223116481ea7b44c55, uid : exit status 1: 2025/10/23 11:49:30 socat[40321] E connect(6, AF=2 127.0.0.1:8080, 16): Connection refused
+ >
+error: lost connection to pod
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl logs pod-print
+Listening on 0.0.0.0:3000
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> kubectl port-forward pod-print 3000:8080
+Forwarding from 127.0.0.1:3000 -> 8080
+Forwarding from [::1]:3000 -> 8080
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> cd .                    
+PS D:\Github\Git-kubernetes\kubernetes-demo\pods> cd ..
+PS D:\Github\Git-kubernetes\kubernetes-demo> cd Replica-Sets
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl apply -f replica.yml
+replicaset.apps/nginx-replicaset created
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kkubectl get replica
+kkubectl : The term 'kkubectl' is not recognized as the name of a cmdlet, function, script file, or 
+operable program. Check the spelling of the name, or if a path was included, verify that the path is     
+correct and try again.
+At line:1 char:1
++ kkubectl get replica
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (kkubectl:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> cubectl get pods
+cubectl : The term 'cubectl' is not recognized as the name of a cmdlet, function, script file, or 
+operable program. Check the spelling of the name, or if a path was included, verify that the path is     
+correct and try again.
+At line:1 char:1
++ cubectl get pods
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (cubectl:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl get pods
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-replicaset-dq76k   1/1     Running   0          46s
+nginx-replicaset-prxrh   1/1     Running   0          46s
+pod-print                1/1     Running   0          16h
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl stop pod-print
+error: unknown command "stop" for "kubectl"
+
+Did you mean this?
+        top
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl pause pod-print
+error: unknown command "pause" for "kubectl"
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl get nodes
+NAME             STATUS   ROLES           AGE   VERSION
+docker-desktop   Ready    control-plane   19h   v1.34.1
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl delete nginx-replicaset
+error: the server doesn't have a resource type "nginx-replicaset"
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl delete replicasets nginx-replicaset
+replicaset.apps "nginx-replicaset" deleted from default namespace
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> kubectl get replicasets
+No resources found in default namespace.
+PS D:\Github\Git-kubernetes\kubernetes-demo\Replica-Sets> cd ..
+PS D:\Github\Git-kubernetes\kubernetes-demo> cd Deployment
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl apply -f deploy.yml
+deployment.apps/nginx-deployment created
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   1/1     1            1           2m41s
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get pods
+NAME                               READY   STATUS    RESTARTS      AGE
+nginx-deployment-bf744486c-c9s4v   1/1     Running   0             2m51s
+pod-print                          1/1     Running   2 (32m ago)   17h
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl deployment nginx-deployment-bf744486c-c9s4v --replicas=10
+error: unknown command "deployment" for "kubectl"
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl deployments nginx-deployment-bf744486c-c9
+s4v --replicas=10
+error: unknown command "deployments" for "kubectl"
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl scale deployment nginx-deployment-bf74448
+6c-c9s4v --replicas=10
+error: no objects passed to scale deployments.apps "nginx-deployment-bf744486c-c9s4v" not found
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   1/1     1            1           11m
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl scale deployments nginx-deployment --replicas=10
+deployment.apps/nginx-deployment scaled
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   10/10   10           10          13m
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get pods
+NAME                               READY   STATUS    RESTARTS      AGE
+nginx-deployment-bf744486c-8pkjz   1/1     Running   0             10m
+nginx-deployment-bf744486c-94vwl   1/1     Running   0             10m
+nginx-deployment-bf744486c-bc6t8   1/1     Running   0             10m
+nginx-deployment-bf744486c-c9s4v   1/1     Running   0             23m
+nginx-deployment-bf744486c-d4249   1/1     Running   0             10m
+nginx-deployment-bf744486c-dp2nj   1/1     Running   0             10m
+nginx-deployment-bf744486c-kb2zr   1/1     Running   0             10m
+nginx-deployment-bf744486c-p5gjq   1/1     Running   0             10m
+nginx-deployment-bf744486c-pgfhh   1/1     Running   0             10m
+nginx-deployment-bf744486c-tsmz8   1/1     Running   0             10m
+pod-print                          1/1     Running   2 (52m ago)   17h
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl namespace web-server
+error: unknown command "namespace" for "kubectl"
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl create namespace web-server
+namespace/web-server created
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get namespace
+NAME              STATUS   AGE
+default           Active   20h
+kube-node-lease   Active   20h
+kube-public       Active   20h
+kube-system       Active   20h
+web-server        Active   10s
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl get pods -n webserver
+No resources found in webserver namespace.
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl run nginx --image-nginx -n web-server
+error: unknown flag: --image-nginx
+See 'kubectl run --help' for usage.
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> kubectl run nginx --image=nginx -n web-server 
+pod/nginx created
+PS D:\Github\Git-kubernetes\kubernetes-demo\Deployment> 
