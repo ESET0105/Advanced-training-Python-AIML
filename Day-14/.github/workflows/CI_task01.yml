@@ -1,0 +1,46 @@
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Testing with pytest
+      run: |
+        if pytest ; then
+        echo "✅ All tests passed!"
+        echo "🎉 Text classification tests completed successfully"
+        fi
+    
+    
+    
+    - name: Printing Echo Message 
+      run: |
+        echo "Hello GitHub Actions"
+        echo "Today's date: $(date)"
+        echo "Branch name: ${{ github.ref_name }}"
+    
+
+
+      
+
